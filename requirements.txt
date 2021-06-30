@@ -2,3 +2,4 @@
 discord.py
 pyngrok
 asyncio-periodic
+python-dotenv
