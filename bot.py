@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser(description='Run the CAMS SMP discord bot', epi
 parser.add_argument('--hostname', required = False, type=str, help='The hostname of the server')
 parser.add_argument('--port', required = False, type=int, help='The port of the server')
 parser.add_argument('--token', required = False, type=str, help='The token of the discord bot')
+parser.add_argument('--tunnel', required = False, type=int, help='The tunnel index for ngrok')
 
 args = parser.parse_args()
 
@@ -29,14 +30,23 @@ if not token:
     load_dotenv()
     token = os.environ.get('TOKEN')
 
-if not args.hostname:
-    tunnel = ngrok.connect(25565, 'tcp')
-    ngrok_url = tunnel.public_url
-    ngrok_parsed = urlparse(ngrok_url)
-    hostname = ngrok_parsed.hostname
-    port = ngrok_parsed.port
-if not port:
-    port = 25565
+if args.tunnel is not None:
+    req = ngrok.api_request('http://localhost:4040/api/tunnels')
+    tunnels = req['tunnels']
+    tunnel = tunnels[args.tunnel]
+    tunnel_url = tunnel['public_url']
+    tunnel_parsed = urlparse(tunnel_url)
+    hostname = tunnel_parsed.hostname
+    port = tunnel_parsed.port
+else:
+    if not args.hostname:
+        tunnel = ngrok.connect(25565, 'tcp')
+        ngrok_url = tunnel.public_url
+        ngrok_parsed = urlparse(ngrok_url)
+        hostname = ngrok_parsed.hostname
+        port = ngrok_parsed.port
+    if not port:
+        port = 25565
 
 print(hostname, port)
 
