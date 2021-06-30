@@ -16,12 +16,19 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Run the CAMS SMP discord bot', epilog='If no hostname is provided, an ngrok server will be started from localhost.')
 parser.add_argument('--hostname', required = False, type=str, help='The hostname of the server')
-parser.add_argument('--port', required = False, type=int, help='The port of the server', )
+parser.add_argument('--port', required = False, type=int, help='The port of the server')
+parser.add_argument('--token', required = False, type=str, help='The token of the discord bot')
 
 args = parser.parse_args()
 
 hostname = args.hostname
 port = args.port
+token = args.token
+
+if not token:
+    load_dotenv()
+    token = os.environ.get('TOKEN')
+
 if not args.hostname:
     tunnel = ngrok.connect(25565, 'tcp')
     ngrok_url = tunnel.public_url
@@ -58,7 +65,7 @@ async def main():
     p = Periodic(3, update_status)
     await p.start()
 
-load_dotenv()
+
 loop = bot.loop
 loop.create_task(main())
-bot.run(os.environ.get('TOKEN'))
+bot.run(token)
