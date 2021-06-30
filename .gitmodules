@@ -1,0 +1,3 @@
+[submodule "mcpacket"]
+	path = mcpacket
+	url = https://github.com/TheRealJoe24/mcpacket
